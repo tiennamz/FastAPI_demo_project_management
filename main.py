@@ -4,11 +4,16 @@ from sqlalchemy.orm import Session
 from app.utils.response import handle_exception, create_response
 from sqlalchemy import text
 from tests.seed import add_member, add_project, add_task, add_user
+from app.routers.auth_routers import router as auth_routers
+from app.routers.user_routers import router as user_routers
+
 
 app = FastAPI(
     title= 'TEAM PROJECT MANAGEMENT API',
     version='1.0.0'
 )
+
+
 
 handle_exception(app)
 
@@ -32,7 +37,7 @@ def add_seed():
 
 
 
-@app.get('/health/check')
+@app.get('/health/check', tags=['Check system'])
 def check_system(request: Request, db: Session = Depends(get_db)):
     try: 
         db.execute(text('SELECT 1'))
@@ -49,3 +54,6 @@ def check_system(request: Request, db: Session = Depends(get_db)):
             detail="Can't connect to server"
         )
     
+    
+app.include_router(auth_routers)
+app.include_router(user_routers)

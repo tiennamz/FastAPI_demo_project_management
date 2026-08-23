@@ -20,7 +20,7 @@ class TaskModel(Base):
     __tablename__ = 'tasks'
     id = Column(Integer, primary_key=True, index=True)
     project_id =Column(Integer, ForeignKey('projects.id'))
-    title = Column(String(100), nullable=False)
+    title = Column(String(100), unique=True, nullable=False)
     description = Column(Text)
     assignee_id = Column(Integer, ForeignKey('users.id'))
     status = Column(SQLEnum(StatusEnum), nullable=False)

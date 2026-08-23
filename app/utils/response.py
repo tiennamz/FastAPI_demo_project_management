@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-
+from slowapi.errors import RateLimitExceeded
 
 T = TypeVar('T')
 
@@ -21,11 +21,11 @@ class BaseResponse(BaseModel, Generic[T]):
 def create_response(request: Request, status_code: int, message: str, data: Any = None, error: Any = None):
     return BaseResponse(
         statusCode=status_code,
-        message= message,
-        data= jsonable_encoder(data),
-        error= error,
-        timestamp= datetime.now().isoformat(),
-        path= request.url.path
+        message=message,
+        data=jsonable_encoder(data),
+        error=error,
+        timestamp=datetime.now().isoformat(),
+        path=request.url.path
         
     )
     
@@ -64,6 +64,17 @@ def handle_exception(app):
         
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=response.model_dump()
+        )
+    @app.exception_handler(RateLimitExceeded)
+    def handle_http_exceptin(
+        request: Request,
+        exc: RateLimitExceeded
+    ):
+        response = create_response(request, status_code=status.HTTP_429_TOO_MANY_REQUESTS, message='Too many request', error=f"Too many requests. Limit: {exc.detail}")
+        
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             content=response.model_dump()
         )
 

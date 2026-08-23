@@ -1,18 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from enum import Enum
-
-
-class StatusEnum(str, Enum):
-    TODO = 'TODO'
-    IN_PROGRESS = 'IN_PROGRESS'
-    DONE = 'DONE'
-
-class PriorityEnum(str, Enum):
-    LOW = 'LOW'
-    MEDIUM = 'MEDIUM'
-    HIGH = 'HIGH'
-
+from app.models.task_model import StatusEnum, PriorityEnum
 
 class CreateTask(BaseModel):
     project_id: int

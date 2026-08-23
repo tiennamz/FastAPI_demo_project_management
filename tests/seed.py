@@ -3,8 +3,6 @@ from app.core.config import DATABASE_URL
 from app.models.project_models import ProjectMemberModel, ProjectModel
 from app.models.user_model import UserModel
 from app.models.task_model import TaskModel
-from fastapi import Depends
-from app.database.database import get_db, SessionLocal
 from datetime import datetime, timedelta
 
 def add_user(db: Session):
@@ -27,7 +25,6 @@ def add_user(db: Session):
         
 def add_project(db: Session):
     
-
     try:
         project = ProjectModel(
             name= 'To do list',

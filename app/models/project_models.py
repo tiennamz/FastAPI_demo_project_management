@@ -11,7 +11,7 @@ class RoleProjectMember(str, Enum):
 class ProjectModel(Base):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key= True, index=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255), unique=True, nullable=False)
     description = Column(Text)
     owner_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(DateTime, server_default=func.now())

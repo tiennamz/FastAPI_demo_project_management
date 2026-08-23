@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-
+    
 
 class RegisterSchema(BaseModel):
     email: EmailStr
@@ -13,3 +13,5 @@ class LoginSechma(BaseModel):
     email: EmailStr
     password: str
     
+class DeleteRefreshToken(LoginSechma):
+    pass

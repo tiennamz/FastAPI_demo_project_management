@@ -1,10 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from enum import Enum
-
-
-class RoleProjectMember(str, Enum):
-    OWNER = 'OWNER'
-    MEMBER = 'MEMBER'
+from app.models.project_models import RoleProjectMember
 
 class AddNewMember(BaseModel):
     project_id: int
