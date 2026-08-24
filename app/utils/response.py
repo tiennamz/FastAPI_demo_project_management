@@ -66,6 +66,7 @@ def handle_exception(app):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=response.model_dump()
         )
+        
     @app.exception_handler(RateLimitExceeded)
     def handle_http_exceptin(
         request: Request,

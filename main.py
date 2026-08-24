@@ -6,6 +6,8 @@ from sqlalchemy import text
 from tests.seed import add_member, add_project, add_task, add_user
 from app.routers.auth_routers import router as auth_routers
 from app.routers.user_routers import router as user_routers
+from app.routers.project_routers import router as project_routers
+from app.routers.project_member_routers import router as project_member_router
 
 
 app = FastAPI(
@@ -57,3 +59,5 @@ def check_system(request: Request, db: Session = Depends(get_db)):
     
 app.include_router(auth_routers)
 app.include_router(user_routers)
+app.include_router(project_routers)
+app.include_router(project_member_router)

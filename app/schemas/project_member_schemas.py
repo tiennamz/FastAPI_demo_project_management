@@ -1,15 +1,21 @@
 from pydantic import BaseModel, ConfigDict
-from enum import Enum
-from app.models.project_models import RoleProjectMember
+from typing import Optional, List
 
-class AddNewMember(BaseModel):
-    project_id: int
+
+class NewMember(BaseModel):
     user_id: int
-    role: RoleProjectMember
     
-class ResponseMember(AddNewMember):
-    
+class ResponseMember(NewMember):
+    project_id: int
+    role: str
     model_config = ConfigDict(from_attributes=True)
     
 
 
+class ProjectWithMembersResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    members: List[ResponseMember] 
+    
+    model_config = ConfigDict(from_attributes=True)

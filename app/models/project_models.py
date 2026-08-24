@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.database import Base
@@ -15,6 +15,8 @@ class ProjectModel(Base):
     description = Column(Text)
     owner_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(DateTime, server_default=func.now())
+    deleted_at = Column(DateTime)
+    is_deleted = Column(Boolean, default=False)
     
     user = relationship(
         'UserModel',
@@ -35,7 +37,7 @@ class ProjectMemberModel(Base):
     __tablename__ = 'project_members'
     project_id = Column(Integer, ForeignKey('projects.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    role = Column(SQLEnum(RoleProjectMember), nullable=False)
+    role = Column(SQLEnum(RoleProjectMember), nullable=False, default='MEMBER')
     joined_at = Column(DateTime, server_default=func.now())
     
     user = relationship(
