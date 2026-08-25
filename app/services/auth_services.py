@@ -53,6 +53,12 @@ def login_service(infor: LoginSechma, db: Session):
             detail='Incorrect email or password.'
         )
     
+    if user.is_active == False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='This user is inactive.'
+        )
+    
     existed_user = db.query(RefreshTokenModel).filter(RefreshTokenModel.email_user == user.email).first()
     
     # if existed_user:

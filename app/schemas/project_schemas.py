@@ -1,8 +1,8 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
 class CreateProject(BaseModel):
-    name: str
+    name: str = Field(gt=0, lt=20)
     description: str
     
 class ResponseProject(CreateProject):

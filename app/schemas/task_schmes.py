@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from enum import Enum
+from datetime import datetime
 from app.models.task_model import StatusEnum, PriorityEnum
 
 class CreateTask(BaseModel):
@@ -10,7 +11,7 @@ class CreateTask(BaseModel):
     assignee_id: Optional[int] = None
     status: StatusEnum
     priority: PriorityEnum
-    due_date: str
+    due_date: datetime
     
     
 class ResopnseTask(BaseModel):
@@ -34,4 +35,4 @@ class UpdateTask(BaseModel):
     assignee_id: Optional[int] = None
     status: Optional[StatusEnum]
     priority: Optional[PriorityEnum]
-    due_date: Optional[str]
+    due_date: Optional[datetime]
