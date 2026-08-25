@@ -21,8 +21,8 @@ def get_profile(request: Request, current_user: UserModel = Depends(get_current_
     )
 
 @router.get('/', response_model=BaseResponse[list[ResponseUser]])
-def get_all_profile(request: Request, is_actived: bool = None, keyword: str = None,  current_user: UserModel = Depends(check_admin), db: Session = Depends(get_db)):
-    users = get_all_profile_service(db, is_actived, keyword)
+def get_all_profile(request: Request, keyword: str = None,  current_user: UserModel = Depends(check_admin), db: Session = Depends(get_db)):
+    users = get_all_profile_service(db, keyword)
     
     return create_response(
         request,
