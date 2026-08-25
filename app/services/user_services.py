@@ -7,8 +7,13 @@ def get_profile_service(current_user: UserModel, db: Session):
     user = db.query(UserModel).filter(UserModel.email == current_user.email).first()
     
     return user
-def get_all_profile_service(db: Session, keyword: str = None):
+
+def get_all_profile_service(db: Session, is_actived: bool = None, keyword: str = None):
     users = db.query(UserModel)
     if keyword:
-        users = users.filter(UserModel.email.ilike(f'%{keyword}%') | UserModel.full_name.ilike(f'%{keyword}%') | UserModel.is_active == keyword.title())
+        users = users.filter(
+            (UserModel.email.ilike(f'%{keyword}%')) |
+            (UserModel.full_name.ilike(f'%{keyword}%')) |
+            ((UserModel.is_active == is_actived))
+        )
     return users
