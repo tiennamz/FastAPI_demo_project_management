@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
 class CreateProject(BaseModel):
-    name: str = Field(gt=0, lt=20)
+    name: str = Field(min_length=0, max_length=20)
     description: str
     
 class ResponseProject(CreateProject):
