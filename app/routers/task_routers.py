@@ -1,6 +1,6 @@
-from app.services.task_services import get_task_by_id_service, update_task_service, delete_task_service, search_task_service, sort_task_service
+from app.services.task_services import get_task_by_id_service, update_task_service, delete_task_service, search_task_service, sort_task_service, add_comment_task_service
 from fastapi import Depends, APIRouter, Request, status
-from app.schemas.task_schmes import ResopnseTask, UpdateTask
+from app.schemas.task_schemas import ResopnseTask, UpdateTask
 from app.utils.response import create_response, BaseResponse
 from sqlalchemy.orm import Session
 from app.dependencies.middleware import get_current_user
@@ -29,6 +29,17 @@ def sort_task(request: Request, user: UserModel = Depends(get_current_user), db:
         status.HTTP_200_OK,
         'Success',
         tasks
+    )
+
+@router.patch('/{task_id}/comment', response_model=BaseResponse[ResopnseTask])
+def add_comment_task(request: Request,task_id: int, comment: str,  user: UserModel = Depends(get_current_user), db: Session = Depends(get_db)):
+    task = add_comment_task_service(task_id, user, comment, db)
+    
+    return create_response(
+        request,
+        status.HTTP_200_OK,
+        'Success',
+        task
     )
 
 

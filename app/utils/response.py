@@ -60,10 +60,10 @@ def handle_exception(app):
         request: Request,
         exc: RequestValidationError
     ):
-        response = create_response(request, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, message='Failed', error=exc.errors())
+        response = create_response(request, status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, message='Failed', error=exc.errors())
         
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content=response.model_dump()
         )
         

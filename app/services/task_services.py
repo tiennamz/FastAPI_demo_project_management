@@ -2,9 +2,8 @@ from sqlalchemy.orm import Session
 from app.models.task_model import TaskModel
 from app.models.user_model import UserModel
 from app.models.project_models import ProjectMemberModel, ProjectModel
-from app.schemas.task_schmes import CreateTask
 from fastapi import status, HTTPException
-from app.schemas.task_schmes import CreateTask, UpdateTask
+from app.schemas.task_schemas import CreateTask, UpdateTask
 
 
 def create_new_task_service(project_id: int, new_task: CreateTask,  user: UserModel, db: Session):
@@ -139,7 +138,7 @@ def search_task_service(db: Session, user: UserModel, status: str = None, priori
         tasks = tasks.filter(TaskModel.priority == priority)
         
     if assignee:
-        tasks = tasks.filter(TaskModel.assignee == assignee)
+        tasks = tasks.filter(TaskModel.assignee_id == assignee)
         
     if title:
         tasks = tasks.filter(TaskModel.title.ilike(f'%{title}%'))
@@ -158,3 +157,12 @@ def sort_task_service(user: UserModel, db: Session, limit: int = 2, offset: int 
             .limit(limit).offset(offset)
         ).all()
     return tasks
+
+def add_comment_task_service(task_id: int, user: UserModel, comment: str, db: Session):
+    task = get_task_by_id_service(task_id, user, db)
+    
+    task.comment = comment
+    db.commit()
+    db.refresh(task)
+    
+    return task

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request, Depends, status
 from sqlalchemy.orm import Session
 from app.schemas.project_member_schemas import NewMember, ProjectWithMembersResponse, ResponseMember
 from app.schemas.project_schemas import CreateProject, ResponseProject, UpdateProject
-from app.schemas.task_schmes import CreateTask, ResopnseTask
+from app.schemas.task_schemas import CreateTask, ResopnseTask
 from app.utils.response import create_response, BaseResponse
 from app.models.user_model import UserModel
 from app.dependencies.middleware import get_current_user
