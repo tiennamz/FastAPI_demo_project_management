@@ -1,5 +1,5 @@
-from app.services.task_services import get_task_by_id_service, update_task_service, delete_task_service, search_task_service, sort_task_service, add_comment_task_service
-from fastapi import Depends, APIRouter, Request, status
+from app.services.task_services import get_task_by_id_service, update_task_service, delete_task_service, search_task_service, sort_task_service, add_comment_task_service, upload_attachment_service
+from fastapi import Depends, APIRouter, Request, status, UploadFile
 from app.schemas.task_schemas import ResopnseTask, UpdateTask
 from app.utils.response import create_response, BaseResponse
 from sqlalchemy.orm import Session
@@ -19,7 +19,21 @@ def search_task(request: Request, task_status: str = None, priority: str = None,
         'Success',
         tasks
     )
+# @router.get('/cvbnertyui')
+# from sqlalchemy.orm import Session
+# # Import UserModel và handle_hash_password từ file của bạn
 
+# def update_all_passwords_to_string(db: Session):
+#     # Lấy tất cả user
+#     users = db.query(UserModel).all()
+    
+#     # Cập nhật mật khẩu thành chữ 'string' đã được hash
+#     for user in users:
+#         user.password_hash = handle_hash_password("string")
+        
+#     # Lưu thay đổi xuống database
+#     db.commit()
+#     print(f"Đã cập nhật thành công mật khẩu cho {len(users)} users.")
 @router.get('/sort', response_model=BaseResponse[list[ResopnseTask]])
 def sort_task(request: Request, user: UserModel = Depends(get_current_user), db: Session = Depends(get_db), limit: int = 2, offset: int = 2):
     tasks = sort_task_service(user, db, limit, offset)
@@ -71,3 +85,13 @@ def delete_task(task_id: int, user: UserModel = Depends(get_current_user), db: S
     
     return 
 
+@router.patch('/{task_id}/attachment', response_model=BaseResponse[ResopnseTask])
+def upload_attachment(request: Request, task_id: int, file: UploadFile, user: UserModel = Depends(get_current_user), db: Session = Depends(get_db)):
+    task = upload_attachment_service(task_id, user, file, db)
+    
+    return create_response(
+        request,
+        status.HTTP_200_OK,
+        'Success',
+        task
+    )

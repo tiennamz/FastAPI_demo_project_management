@@ -9,7 +9,7 @@ def handle_hash_password(password: str):
     salt = bcrypt.gensalt()
     hash_password = bcrypt.hashpw(password.encode(), salt)
     
-    return hash_password
+    return hash_password.decode()
 
 def verify_password(password: str, hash_password: str):
     return bcrypt.checkpw(password.encode(), hash_password.encode())

@@ -8,7 +8,9 @@ from app.routers.auth_routers import router as auth_routers
 from app.routers.user_routers import router as user_routers
 from app.routers.project_routers import router as project_routers
 from app.routers.task_routers import router as task_routers
-
+from app.core.config import UPLOAD_DIRECTORY
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI(
     title= 'TEAM PROJECT MANAGEMENT API',
@@ -16,11 +18,12 @@ app = FastAPI(
 )
 
 
-
 handle_exception(app)
 
 Base.metadata.create_all(bind=engine)
 
+os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+app.mount('/static', StaticFiles(directory='static'), name='statics')
 
 @app.on_event('startup')
 def add_seed():

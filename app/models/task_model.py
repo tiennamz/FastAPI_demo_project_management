@@ -26,7 +26,7 @@ class TaskModel(Base):
     status = Column(SQLEnum(StatusEnum), default=StatusEnum.TODO)
     priority = Column(SQLEnum(PriorityEnum), nullable=False)
     comment = Column(String(100))
-    attachment = Column(String(100))
+    attachment = Column(Text)
     due_date = Column(DateTime)    
     created_at = Column(DateTime, server_default=func.now())
 

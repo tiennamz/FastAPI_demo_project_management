@@ -13,7 +13,10 @@ def get_all_profile_service(db: Session, keyword: str = None, is_active: bool = 
     if keyword:
         users = users.filter(
             (UserModel.email.ilike(f'%{keyword}%')) |
-            (UserModel.full_name.ilike(f'%{keyword}%')) |
-            ((UserModel.is_active == is_active))
+            (UserModel.full_name.ilike(f'%{keyword}%')) 
         )
+        
+    if is_active is not None:
+        users = users.filter(UserModel.is_active == is_active)
+        
     return users.all()

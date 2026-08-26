@@ -2,8 +2,12 @@ from sqlalchemy.orm import Session
 from app.models.task_model import TaskModel
 from app.models.user_model import UserModel
 from app.models.project_models import ProjectMemberModel, ProjectModel
-from fastapi import status, HTTPException
+from fastapi import status, HTTPException, UploadFile
 from app.schemas.task_schemas import CreateTask, UpdateTask
+from app.core.config import UPLOAD_DIRECTORY
+import uuid
+import os
+import shutil
 
 
 def create_new_task_service(project_id: int, new_task: CreateTask,  user: UserModel, db: Session):
@@ -156,6 +160,13 @@ def sort_task_service(user: UserModel, db: Session, limit: int = 2, offset: int 
             .order_by(TaskModel.created_at.desc())
             .limit(limit).offset(offset)
         ).all()
+    
+    if not tasks:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'There is currently no data on page {offset}.'
+        )
+    
     return tasks
 
 def add_comment_task_service(task_id: int, user: UserModel, comment: str, db: Session):
@@ -166,3 +177,31 @@ def add_comment_task_service(task_id: int, user: UserModel, comment: str, db: Se
     db.refresh(task)
     
     return task
+
+def upload_attachment_service(task_id: int, user: UserModel, file: UploadFile, db: Session):
+    task = get_task_by_id_service(task_id, user, db)
+    
+    valid_types = ["application/zip", "application/x-zip-compressed", "multipart/x-zip"]
+    
+    if file.content_type not in valid_types or file.filename.split('.')[-1].lower() != 'zip':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Only allows uploading ZIP files.'
+        )
+    
+    new_file_name = f'{uuid.uuid4()}_{file.filename}'
+    
+    file_path = os.path.join(UPLOAD_DIRECTORY, new_file_name)
+    
+    with open(file_path, 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    file_url = f'http://127.0.0.1:8000/{file_path}'
+    
+    task.attachment = file_url
+    
+    db.commit()
+    db.refresh(task)
+    
+    return task
+        

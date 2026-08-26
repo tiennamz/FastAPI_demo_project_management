@@ -19,6 +19,8 @@ class ResopnseTask(BaseModel):
     assignee_id: Any
     status: str
     priority: str
+    comment: Any
+    attachment: Any
     due_date: str
     created_at: str
     
