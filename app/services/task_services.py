@@ -9,7 +9,6 @@ import uuid
 import os
 import shutil
 
-
 def create_new_task_service(project_id: int, new_task: CreateTask,  user: UserModel, db: Session):
     project = db.query(ProjectMemberModel).filter(ProjectMemberModel.project_id == project_id, ProjectMemberModel.user_id == user.id).first()
     
@@ -64,9 +63,12 @@ def get_task_by_id_service(task_id: int, user: UserModel, db: Session):
             detail=f'Not found task with ID {task_id}'
         )
         
-    project = db.query(TaskModel).select_from(TaskModel).join(ProjectModel).join(ProjectMemberModel).filter(ProjectMemberModel.user_id == user.id).first()
+    is_member = db.query(ProjectMemberModel).filter(
+                ProjectMemberModel.project_id == task.project_id,
+                ProjectMemberModel.user_id == user.id
+        ).first()
         
-    if not project:
+    if not is_member:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='You do not belong to this project.'
@@ -178,6 +180,9 @@ def add_comment_task_service(task_id: int, user: UserModel, comment: str, db: Se
     
     return task
 
+
+MAX_FILE_SIZE = 10 * 1024 * 1024
+
 def upload_attachment_service(task_id: int, user: UserModel, file: UploadFile, db: Session):
     task = get_task_by_id_service(task_id, user, db)
     
@@ -187,6 +192,12 @@ def upload_attachment_service(task_id: int, user: UserModel, file: UploadFile, d
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Only allows uploading ZIP files.'
+        )
+    
+    if file.size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'File too large. Max allowed size is {MAX_FILE_SIZE // (1024*1024)} MB.'
         )
     
     new_file_name = f'{uuid.uuid4()}_{file.filename}'

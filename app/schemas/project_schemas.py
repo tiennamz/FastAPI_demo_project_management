@@ -2,8 +2,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
 class CreateProject(BaseModel):
-    name: str = Field(min_length=0, max_length=20)
-    description: str
+    name: str = Field(min_length=1, max_length=50)
+    description: Optional[str] = None
     
 class ResponseProject(CreateProject):
     id: int
@@ -14,5 +14,5 @@ class ResponseProject(CreateProject):
     
     
 class UpdateProject(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
+    name: Optional[str] = None
+    description: Optional[str] = None

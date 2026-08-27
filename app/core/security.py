@@ -30,7 +30,7 @@ def create_access_token(data: dict):
 def create_refresh_token(data: dict):
     payload = data.copy()
     
-    expire_time = datetime.now(timezone.utc) + timedelta(minutes=int(REFRESH_TOKEN_EXPIRE_DAY))
+    expire_time = datetime.now(timezone.utc) + timedelta(days=int(REFRESH_TOKEN_EXPIRE_DAY))
     
     payload.update({
         'exp': expire_time

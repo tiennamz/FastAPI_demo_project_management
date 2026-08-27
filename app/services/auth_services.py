@@ -15,10 +15,13 @@ def register_service(new_user: RegisterSchema, db: Session):
             detail='Email already exists'
         )
     
-    role_user = new_user.role.strip().upper()
     
-    if not role_user:
-        role_user = 'ADMIN'
+    if not new_user.role:
+        role_user = 'USER'
+        
+    else:
+        role_user = new_user.role.strip().upper()
+        
     
     if role_user not in [role.value for role in RoleEnum]:
         raise HTTPException(
