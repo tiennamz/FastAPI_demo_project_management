@@ -52,7 +52,7 @@ def login_service(infor: LoginSechma, db: Session):
     
     if not user or not verify_password(infor.password, user.password_hash):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail='Incorrect email or password.'
         )
     

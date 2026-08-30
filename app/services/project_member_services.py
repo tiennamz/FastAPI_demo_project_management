@@ -58,6 +58,11 @@ def delete_member_service(pro_id: int, member_id: int, user: UserModel, db: Sess
     
     role_user = db.query(ProjectMemberModel.role).join(ProjectModel).filter(ProjectMemberModel.user_id == user.id, ProjectModel.id == pro_id).scalar()
             
+    if role_user == 'MEMBER' and member_id == member.user_id:
+        db.delete(member)
+        db.commit() 
+            
+            
     if role_user != 'OWNER':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -74,6 +79,12 @@ def delete_member_service(pro_id: int, member_id: int, user: UserModel, db: Sess
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='You are owner so you can delete yourself'
+        )
+        
+    if member_id == user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='The owner cannot delete themselves.'
         )
         
     db.delete(member)
