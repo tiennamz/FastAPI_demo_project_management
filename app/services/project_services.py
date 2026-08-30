@@ -17,7 +17,7 @@ def create_new_project_service(user: UserModel, new_project: CreateProject, db: 
         )
     
     project = ProjectModel(
-        name= new_project.name,
+        name= new_project.name.title(),
         description = new_project.description,
         owner_id = user.id
         
