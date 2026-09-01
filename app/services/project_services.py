@@ -5,6 +5,17 @@ from app.models.project_models import ProjectMemberModel
 from app.models.user_model import UserModel
 from fastapi import status, HTTPException
 from datetime import datetime
+import logging
+
+project_logger = logging.getLogger("project_logger")
+project_logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(r"C:\Users\ghast\OneDrive\Tài liệu\[IT-215] Phát triển dịch vụ Web với FastAPI\Project Team Management\app\logging\project_logging.log")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - Executor: %(user)s - Action: %(action)-5s - Detail: %(message)s")
+file_handler.setFormatter(formatter)
+
+if not project_logger.handlers:
+    project_logger.addHandler(file_handler)
 
 def create_new_project_service(user: UserModel, new_project: CreateProject, db: Session):
     
@@ -42,6 +53,14 @@ def create_new_project_service(user: UserModel, new_project: CreateProject, db: 
     db.add(member)
     db.commit()
     db.refresh(project)
+    
+    project_logger.info(
+        "Successfully created new project",
+        extra={
+            "user": user.email,
+            "action": "Create new project"
+        }
+    )
     
     return project
 
@@ -103,6 +122,14 @@ def update_project_service(id: int, user: UserModel, update_project: UpdateProje
     db.commit()
     db.refresh(project)
     
+    project_logger.info(
+            f"Successfully update project {id}",
+            extra={
+                "user": user.email,
+                "action": "Update project"
+            }
+        )
+    
     return project
 
 def soft_delete_project_service(id: int, user: UserModel, db: Session):
@@ -124,6 +151,14 @@ def soft_delete_project_service(id: int, user: UserModel, db: Session):
     project.is_deleted = True
     
     db.commit()
+    
+    project_logger.info(
+                f"Successfully soft deleta project {id}",
+                extra={
+                    "user": user.email,
+                    "action": "Soft delete project"
+                }
+            )
     
     return None
 

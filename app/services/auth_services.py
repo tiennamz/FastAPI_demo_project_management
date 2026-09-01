@@ -3,8 +3,18 @@ from app.schemas.auth_schema import RegisterSchema, LoginSechma, DeleteRefreshTo
 from app.models.user_model import UserModel, RoleEnum
 from app.models.refresh_token_model import RefreshTokenModel
 from fastapi import status, HTTPException
-from enum import Enum
 from app.core.security import handle_hash_password, verify_password, create_access_token, create_refresh_token, decode_access_token
+import logging
+
+auth_logger = logging.getLogger("auth_logger")
+auth_logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(r"C:\Users\ghast\OneDrive\Tài liệu\[IT-215] Phát triển dịch vụ Web với FastAPI\Project Team Management\app\logging\auth_logging.log")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - Executor: %(user)s - Action: %(action)s - Detail: %(message)s")    
+file_handler.setFormatter(formatter)
+
+if not auth_logger.handlers:
+    auth_logger.addHandler(file_handler)
 
 def register_service(new_user: RegisterSchema, db: Session):
     existed_email = db.query(UserModel).filter(UserModel.email == new_user.email.strip()).first()
@@ -36,13 +46,20 @@ def register_service(new_user: RegisterSchema, db: Session):
         role = role_user
     )
     try:
-    
+        
         db.add(user)
         db.commit()
         db.refresh(user)
         
-        return user
+        auth_logger.info(
+            "Registration successful",
+            extra={
+                "user": f"{new_user.email}",
+                "action": "register"
+            }
+        )
         
+        return user
         
     except:
         db.rollback()

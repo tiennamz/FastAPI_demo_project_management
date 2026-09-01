@@ -8,7 +8,18 @@ from app.core.config import UPLOAD_DIRECTORY
 import uuid
 import os
 import shutil
+import logging
 
+task_logger = logging.getLogger("task_logger")
+task_logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(r"C:\Users\ghast\OneDrive\Tài liệu\[IT-215] Phát triển dịch vụ Web với FastAPI\Project Team Management\app\logging\task_logging.log")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - Executor: %(user)s - Action: %(action)s - Detail: %(message)s")
+file_handler.setFormatter(formatter)
+
+if not task_logger.handlers:
+    task_logger.addHandler(file_handler)
+    
 def create_new_task_service(project_id: int, new_task: CreateTask,  user: UserModel, db: Session):
     project = db.query(ProjectMemberModel).filter(ProjectMemberModel.project_id == project_id, ProjectMemberModel.user_id == user.id).first()
     
@@ -37,6 +48,14 @@ def create_new_task_service(project_id: int, new_task: CreateTask,  user: UserMo
     db.add(task)
     db.commit()
     db.refresh(task)
+    
+    task_logger.info(
+        "Successfully create new task",
+        extra={
+            "user": user.email,
+            "action": "Create new task  "
+        }
+    )
     
     return task
 
@@ -100,6 +119,13 @@ def update_task_service(task_id: int, user: UserModel, upd_task: UpdateTask, db:
     role_user = db.query(ProjectMemberModel.role).join(ProjectModel).filter(ProjectMemberModel.user_id == user.id, ProjectModel.id == task.project_id).scalar()
         
     if role_user != 'OWNER':
+        task_logger.warning(
+            "Failed to delete member because you are not owner.",
+            extra={
+                "user": user.email,
+                "action": "Delete member"
+            }
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only the owner can perform this function."
@@ -111,6 +137,14 @@ def update_task_service(task_id: int, user: UserModel, upd_task: UpdateTask, db:
     db.commit()
     db.refresh(task)
     
+    task_logger.info(
+            f"Successfully update task {task_id}",
+            extra={
+                "user": user.email,
+                "action": "Update task"
+            }
+        )
+    
     return task
 
 def delete_task_service(task_id: int, user: UserModel, db: Session):
@@ -119,6 +153,13 @@ def delete_task_service(task_id: int, user: UserModel, db: Session):
     role_user = db.query(ProjectMemberModel.role).join(ProjectModel).filter(ProjectMemberModel.user_id == user.id, ProjectModel.id == task.project_id).scalar()
     
     if role_user != 'OWNER':
+        task_logger.warning(
+            "Failed to delete member because you are not owner.",
+            extra={
+                "user": user.email,
+                "action": "Delete member"
+            }
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only the owner can perform this function."
@@ -126,6 +167,14 @@ def delete_task_service(task_id: int, user: UserModel, db: Session):
 
     db.delete(task)
     db.commit()
+    
+    task_logger.info(
+        f"Successfully delete task {task_id}",
+        extra={
+            "user": user.email,
+            "action": "Delete new task  "
+        }
+    )
     
     return task
 
@@ -178,6 +227,14 @@ def add_comment_task_service(task_id: int, user: UserModel, comment: str, db: Se
     db.commit()
     db.refresh(task)
     
+    task_logger.info(
+        f"Successfully add comment to task {task_id}",
+        extra={
+            "user": user.email,
+            "action": "Add comment"
+        }
+    )
+    
     return task
 
 
@@ -213,6 +270,15 @@ def upload_attachment_service(task_id: int, user: UserModel, file: UploadFile, d
     
     db.commit()
     db.refresh(task)
+    
+    task_logger.info(
+        f"Successfully add file to task {task_id}",
+        extra={
+            "user": user.email,
+            "action": "Add filr"
+        }
+    )
+    
     
     return task
         

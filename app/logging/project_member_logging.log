@@ -1,0 +1,6 @@
+2026-08-31 18:13:05,587 - WARNING - Người làm: user@example.com - Hành động: Add members - Chi tiết: Failed to add member because you are not owner.
+2026-08-31 18:14:04,307 - WARNING - Người làm: user@example.com - Hành động: Delete member - Chi tiết: Failed to delete member because you are not owner.
+2026-08-31 18:14:13,141 - WARNING - Người làm: user@example.com - Hành động: Delete member - Chi tiết: Failed to delete member because you are not owner.
+2026-08-31 18:14:18,334 - WARNING - Người làm: user@example.com - Hành động: Delete member - Chi tiết: Failed to delete member because you are not owner.
+2026-08-31 18:17:46,382 - WARNING - Executor: user@example.com - Action: Delete member - Detail: Failed to delete member because you are not owner.
+2026-08-31 18:24:35,691 - INFO - Executor: user@example.com - Action: Add members - Detail: Add successful members to the project 147

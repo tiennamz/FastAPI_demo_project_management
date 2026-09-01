@@ -6,7 +6,17 @@ from app.schemas.project_member_schemas import NewMember
 from fastapi import status, HTTPException
 from app.dependencies.middleware import get_current_user
 from app.database.database import get_db
+import logging
 
+project_member_logger = logging.getLogger("project_member_logger")
+project_member_logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(r"C:\Users\ghast\OneDrive\Tài liệu\[IT-215] Phát triển dịch vụ Web với FastAPI\Project Team Management\app\logging\project_member_logging.log")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - Executor: %(user)s - Action: %(action)s - Detail: %(message)s")
+file_handler.setFormatter(formatter)
+
+if not project_member_logger.handlers:
+    project_member_logger.addHandler(file_handler)
 
 def add_new_member_service(pro_id: int, members: list[NewMember], user: UserModel, db: Session):
     project = db.query(ProjectModel).join(ProjectMemberModel).filter(ProjectMemberModel.user_id == user.id, ProjectModel.id == pro_id, ProjectModel.is_deleted == False).first()
@@ -20,6 +30,13 @@ def add_new_member_service(pro_id: int, members: list[NewMember], user: UserMode
     role_user = db.query(ProjectMemberModel.role).join(ProjectModel).filter(ProjectMemberModel.user_id == user.id, ProjectModel.id == pro_id).scalar()
         
     if role_user != 'OWNER':
+        project_member_logger.warning(
+            "Failed to add member because you are not owner.",
+            extra={
+                "user": user.email,
+                "action": "Add members"
+            }
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only the owner can perform this function."
@@ -36,7 +53,7 @@ def add_new_member_service(pro_id: int, members: list[NewMember], user: UserMode
         elif existed_member:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f'Member with {member.user_id} in this project'
+                detail=f'This member has been on this project.'
             )
             
         new_member = ProjectMemberModel(
@@ -48,10 +65,28 @@ def add_new_member_service(pro_id: int, members: list[NewMember], user: UserMode
     db.commit()
     db.refresh(project)
     _ = project.members
+    
+    project_member_logger.info(
+        f"Add successful members to the project {pro_id}",
+        extra={
+            "user": user.email,
+            "action": "Add members"
+        }
+    )
+    
     return project
     
     
 def delete_member_service(pro_id: int, member_id: int, user: UserModel, db: Session):
+    project = db.query(ProjectModel).filter(ProjectModel.id == pro_id).first()
+    
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Not found project with ID {pro_id}'
+        )
+    
+    
     member = db.query(ProjectMemberModel).options(
         joinedload(ProjectMemberModel.project)
     ).filter(ProjectMemberModel.project_id == pro_id, ProjectMemberModel.user_id == member_id, ProjectModel.is_deleted == False).first()
@@ -64,6 +99,13 @@ def delete_member_service(pro_id: int, member_id: int, user: UserModel, db: Sess
             
             
     if role_user != 'OWNER':
+        project_member_logger.warning(
+            "Failed to delete member because you are not owner.",
+            extra={
+                "user": user.email,
+                "action": "Delete member"
+            }
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only the owner can perform this function."
@@ -89,6 +131,14 @@ def delete_member_service(pro_id: int, member_id: int, user: UserModel, db: Sess
         
     db.delete(member)
     db.commit()
+    
+    project_member_logger.info(
+        f"Successfully removed member {member_id} from the project {pro_id}.",
+        extra={ 
+            "user": user.email,
+            "action": "Delete member"
+        }
+    )
     
     return None
 
